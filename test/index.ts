@@ -1,6 +1,15 @@
-import assert from 'assert';
-import getAny from '../src';
+import any from '../src';
 
-const any = getAny();
+console.log(any.a.b.c.d + '')
 
-assert.equal(any.a.b.c.d, 'a.b.c.d');
+const a = {
+    s: {
+        d: {
+            f: 'e'
+        }
+    }
+};
+
+const x = Object.assign(a, any);
+
+console.log(x)

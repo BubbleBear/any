@@ -1,41 +1,39 @@
-export default function any() {
-    const proto = Object.defineProperties({}, {
-        [Symbol.toPrimitive]: {
-            value() {
-                return this.toString();
-            },
+const proto = Object.defineProperties({}, {
+    [Symbol.toPrimitive]: {
+        value() {
+            return this.toString();
         },
-        [Symbol.toStringTag]: {
-            get() {
-                return 'Any';
-            },
+    },
+    [Symbol.toStringTag]: {
+        get() {
+            return 'Any';
         },
-        toString: {
-            value(...args: string[]) {
-                return args.join('.');
-            },
-            configurable: true,
+    },
+    toString: {
+        value(...args: string[]) {
+            return args.join('.');
         },
-    });
+        configurable: true,
+    },
+});
 
-    return new Proxy(proto, {
-        get(target, key, proxy) {
-            if (target[key] === undefined) {
-                const newProxy = Object.create(proxy);
+export default new Proxy(proto, {
+    get(target, key, proxy) {
+        if (target[key] === undefined) {
+            const newProxy = Object.create(proxy);
 
-                const toStringDescriptor = Object.getOwnPropertyDescriptor(proxy, 'toString');
+            const toStringDescriptor = Object.getOwnPropertyDescriptor(proxy, 'toString');
 
-                if (toStringDescriptor && typeof toStringDescriptor.value === 'function') {
-                    Object.defineProperty(newProxy, 'toString', {
-                        value: proxy.toString.bind(newProxy, key),
-                        configurable: true,
-                    });
-                }
-
-                return newProxy;
+            if (toStringDescriptor && typeof toStringDescriptor.value === 'function') {
+                Object.defineProperty(newProxy, 'toString', {
+                    value: proxy.toString.bind(newProxy, key),
+                    configurable: true,
+                });
             }
 
-            return target[key];
+            return newProxy;
         }
-    });
-}
+
+        return target[key];
+    }
+});

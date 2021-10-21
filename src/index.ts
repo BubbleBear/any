@@ -17,23 +17,25 @@ const proto = Object.defineProperties({}, {
     },
 });
 
-export default new Proxy(proto, {
-    get(target, key, proxy) {
-        if (target[key] === undefined) {
-            const newProxy = Object.create(proxy);
+export default Object.preventExtensions(
+    new Proxy(proto, {
+        get(target, key, proxy) {
+            if (target[key] === undefined) {
+                const newProxy = Object.create(proxy);
 
-            const toStringDescriptor = Object.getOwnPropertyDescriptor(proxy, 'toString');
+                const toStringDescriptor = Object.getOwnPropertyDescriptor(proxy, 'toString');
 
-            if (toStringDescriptor && typeof toStringDescriptor.value === 'function') {
-                Object.defineProperty(newProxy, 'toString', {
-                    value: proxy.toString.bind(newProxy, key),
-                    configurable: true,
-                });
+                if (toStringDescriptor && typeof toStringDescriptor.value === 'function') {
+                    Object.defineProperty(newProxy, 'toString', {
+                        value: proxy.toString.bind(newProxy, key),
+                        configurable: true,
+                    });
+                }
+
+                return newProxy;
             }
 
-            return newProxy;
+            return target[key];
         }
-
-        return target[key];
-    }
-});
+    })
+);

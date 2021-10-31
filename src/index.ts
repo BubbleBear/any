@@ -18,7 +18,7 @@ const proto = Object.defineProperties({}, {
 });
 
 export default Object.preventExtensions(
-    new Proxy(proto, {
+    new Proxy<any>(proto, {
         get(target, key, proxy) {
             if (target[key] === undefined) {
                 const newProxy = Object.create(proxy);
